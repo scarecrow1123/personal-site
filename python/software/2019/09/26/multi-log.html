@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>How to handle multi process logging in Python? | fastpages</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="How to handle multi process logging in Python?" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="On using QueueHandlelr and QueueListener classes from Python’s logging module" />
+<meta property="og:description" content="On using QueueHandlelr and QueueListener classes from Python’s logging module" />
+<link rel="canonical" href="https://scarecrow1123.github.io/personal-site/python/software/2019/09/26/multi-log.html" />
+<meta property="og:url" content="https://scarecrow1123.github.io/personal-site/python/software/2019/09/26/multi-log.html" />
+<meta property="og:site_name" content="fastpages" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-09-26T00:00:00-05:00" />
+<script type="application/ld+json">
+{"description":"On using QueueHandlelr and QueueListener classes from Python’s logging module","url":"https://scarecrow1123.github.io/personal-site/python/software/2019/09/26/multi-log.html","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://scarecrow1123.github.io/personal-site/python/software/2019/09/26/multi-log.html"},"headline":"How to handle multi process logging in Python?","dateModified":"2019-09-26T00:00:00-05:00","datePublished":"2019-09-26T00:00:00-05:00","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/personal-site/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://scarecrow1123.github.io/personal-site/feed.xml" title="fastpages" /><link rel="shortcut icon" type="image/x-icon" href="/personal-site/images/favicon.ico"><link href="https://unpkg.com/@primer/css/dist/primer.css" rel="stylesheet" />
+<link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css">
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/personal-site/">fastpages</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/personal-site/about/">About Me</a><a class="page-link" href="/personal-site/search/">Search</a><a class="page-link" href="/personal-site/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">How to handle multi process logging in Python?</h1><p class="page-description">On using QueueHandlelr and QueueListener classes from Python's logging module</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2019-09-26T00:00:00-05:00" itemprop="datePublished">
+        Sep 26, 2019
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      3 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/personal-site/categories/#python">python</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/personal-site/categories/#software">software</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul class="section-nav">
+</ul><p>Python’s <code class="language-plaintext highlighter-rouge">logging</code> module provides a list of super <a href="https://docs.python.org/3/howto/logging.html#useful-handlers">useful handlers</a> to handle/redirect log messages to required target destinations. For instance <code class="language-plaintext highlighter-rouge">FileHandler</code> sends the messages to a file, <code class="language-plaintext highlighter-rouge">DatagramHandler</code> sends to UDP ports, etc. In a multi process setup however, using <code class="language-plaintext highlighter-rouge">FileHandler</code> to redirect logs to the same file from different processes would only corrupt the log file. Explicitly acquiring locks to the same file is a bad thing to do.</p>
+
+<p>An out-of-the-box way is to use this package called <a href="https://pypi.org/project/multiprocessing-logging/"><code class="language-plaintext highlighter-rouge">multiprocess-logging</code></a>. This pip package implements a custom log handler. The handler receives all the messages, puts them in an internal <a href="https://docs.python.org/3/library/multiprocessing.html?highlight=multiprocessing#multiprocessing.Queue">queue</a> and emits by dequeuing messages from the queue.</p>
+
+<p>Aggregating the log messages to a queue is the only way to handle this scenario. But there is a graceful alternative way to achieve this. Python’s logging module provides built in mechanisms to handle queue based logging with <a href="https://docs.python.org/3/library/logging.handlers.html#logging.handlers.QueueHandler"><code class="language-plaintext highlighter-rouge">QueueHandler</code></a> and <a href="https://docs.python.org/3/library/logging.handlers.html#queuelistener"><code class="language-plaintext highlighter-rouge">QueueListener</code></a> classes.</p>
+
+<p>Similar to how <code class="language-plaintext highlighter-rouge">FileHandler</code> provides a way to do file based logging, <code class="language-plaintext highlighter-rouge">QueueHandler</code> helps to log to a queue object. This queue can be from the <a href="https://docs.python.org/3/library/queue.html?highlight=simplequeue"><code class="language-plaintext highlighter-rouge">queue</code></a> module or <a href="https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Queue"><code class="language-plaintext highlighter-rouge">multiprocessing.Queue</code></a>.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">logging.handlers</span> <span class="kn">import</span> <span class="n">QueueHandler</span>
+<span class="kn">from</span> <span class="nn">queue</span> <span class="kn">import</span> <span class="n">SimpleQueue</span>
+
+
+<span class="n">logging</span><span class="p">.</span><span class="n">warning</span><span class="p">(</span><span class="s">"Test this warning in the console"</span><span class="p">)</span>
+
+
+<span class="n">q</span> <span class="o">=</span> <span class="n">SimpleQueue</span><span class="p">()</span>
+<span class="n">queue_handler</span> <span class="o">=</span> <span class="n">QueueHandler</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+
+<span class="n">root_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="p">.</span><span class="n">getLogger</span><span class="p">()</span>
+
+<span class="c1"># remove the StreamHandler instance that is set by default
+</span><span class="n">root_logger</span><span class="p">.</span><span class="n">handlers</span><span class="p">.</span><span class="n">pop</span><span class="p">()</span>
+
+<span class="c1"># add queue handler
+# this will stop the log messages from printing in the console
+</span><span class="n">root_logger</span><span class="p">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">queue_handler</span><span class="p">)</span>
+
+<span class="n">logging</span><span class="p">.</span><span class="n">warning</span><span class="p">(</span><span class="s">"Test this warning in the queue"</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">q</span><span class="p">.</span><span class="n">get</span><span class="p">())</span>
+</code></pre></div></div>
+
+<p>This prints:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>WARNING:root:Test this warning in the console
+&lt;LogRecord: root, 30, test.py, 14, "Test this warning in the queue"&gt;
+</code></pre></div></div>
+
+<p>Note the second printed line is only because of the <code class="language-plaintext highlighter-rouge">print</code> function. The second <code class="language-plaintext highlighter-rouge">logging.warning</code> function has consumed the message and put it in the <code class="language-plaintext highlighter-rouge">q</code> object.</p>
+
+<p><code class="language-plaintext highlighter-rouge">QueueListener</code> is used along with the <code class="language-plaintext highlighter-rouge">QueueHandler</code> to collect messages from the queue and push them to various other targets such as a file, UDP port, etc.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">...</span>
+<span class="n">file_handler</span> <span class="o">=</span> <span class="n">FileHandler</span><span class="p">(</span><span class="s">"out.log"</span><span class="p">)</span>
+<span class="n">listener</span> <span class="o">=</span> <span class="n">QueueListener</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">file_handler</span><span class="p">)</span>
+<span class="n">listener</span><span class="p">.</span><span class="n">start</span><span class="p">()</span>
+<span class="p">...</span>
+</code></pre></div></div>
+
+<p>The <code class="language-plaintext highlighter-rouge">listener</code> looks for messages in <code class="language-plaintext highlighter-rouge">q</code> and pushes them to <code class="language-plaintext highlighter-rouge">file_handler</code> which writes to <code class="language-plaintext highlighter-rouge">out.log</code>. Let’s use the same flow in a multi process setup.</p>
+
+<p>Assume a master process that spawns 4 children and all log messages are to be written to <code class="language-plaintext highlighter-rouge">out.log</code> file. Any logger message from the children will be written to a <code class="language-plaintext highlighter-rouge">multiprocessing.Queue</code>. The children need to initialize a <code class="language-plaintext highlighter-rouge">QueueHandler</code> and attach it to their root logger as seen above to achieve this. The same queue is listened at the master process’s <code class="language-plaintext highlighter-rouge">QueueListener</code>.</p>
+
+<p>Here’s how the master process’s logging is setup:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">setup_primary_logging</span><span class="p">():</span>
+    <span class="n">log_queue</span> <span class="o">=</span> <span class="n">mp</span><span class="p">.</span><span class="n">Queue</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Handlers for stream/file logging
+</span>    <span class="n">output_file_log_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="p">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s">"out.log"</span><span class="p">)</span>
+    <span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="p">.</span><span class="n">Formatter</span><span class="p">(</span><span class="s">'%(asctime)s - %(levelname)s - %(message)s'</span><span class="p">)</span>
+    <span class="n">output_file_log_handler</span><span class="p">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
+    <span class="n">output_file_log_handler</span><span class="p">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="p">.</span><span class="n">INFO</span><span class="p">)</span>
+
+    <span class="c1"># This listener listens to the `log_queue` and pushes the messages to the list of
+</span>    <span class="c1"># handlers specified.
+</span>    <span class="n">listener</span> <span class="o">=</span> <span class="n">QueueListener</span><span class="p">(</span><span class="n">log_queue</span><span class="p">,</span> <span class="n">output_file_log_handler</span><span class="p">,</span> <span class="n">error_file_log_handler</span><span class="p">,</span> <span class="n">respect_handler_level</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">listener</span><span class="p">.</span><span class="n">start</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">log_queue</span>
+</code></pre></div></div>
+
+<p>And the worker’s logging setup:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">setup_worker_logging</span><span class="p">(</span><span class="n">log_queue</span><span class="p">):</span>
+    <span class="n">queue_handler</span> <span class="o">=</span> <span class="n">QueueHandler</span><span class="p">(</span><span class="n">log_queue</span><span class="p">)</span>
+    <span class="n">queue_handler</span><span class="p">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="p">.</span><span class="n">INFO</span><span class="p">)</span>
+
+    <span class="n">root_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="p">.</span><span class="n">getLogger</span><span class="p">()</span>
+    <span class="n">root_logger</span><span class="p">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">queue_handler</span><span class="p">)</span>
+
+    <span class="c1"># Default logger level is WARNING, hence the change. Otherwise, any worker logs
+</span>    <span class="c1"># are not going to get bubbled up to the parent's logger handlers from where the
+</span>    <span class="c1"># actual logs are written to the output
+</span>    <span class="n">root_logger</span><span class="p">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="p">.</span><span class="n">INFO</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Note that <code class="language-plaintext highlighter-rouge">log_queue</code> object has to be sent from the master to all the children. So the master process looks something like this:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">worker_fn</span><span class="p">(</span><span class="n">log_queue</span><span class="p">):</span>
+    <span class="n">setup_worker_logging</span><span class="p">(</span><span class="n">log_queue</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">master_fn</span><span class="p">():</span>
+     <span class="n">log_queue</span> <span class="o">=</span> <span class="n">setup_primary_logging</span><span class="p">()</span>
+     <span class="n">mp</span><span class="p">.</span><span class="n">spawn</span><span class="p">(</span><span class="n">worker_fn</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">log_queue</span><span class="p">,),</span> <span class="n">n_procs</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Any messages from the worker will be logged to <code class="language-plaintext highlighter-rouge">out.log</code> file with the above setup. A complete working example can be seen in <a href="https://gist.github.com/scarecrow1123/967a97f553697743ae4ec7af36690da6">this gist</a>.</p>
+
+
+  </div><a class="u-url" href="/personal-site/python/software/2019/09/26/multi-log.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/personal-site/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/personal-site/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/personal-site/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>An easy to use blogging platform with support for Jupyter Notebooks.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/fastai" title="fastai"><svg class="svg-icon grey"><use xlink:href="/personal-site/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/fastdotai" title="fastdotai"><svg class="svg-icon grey"><use xlink:href="/personal-site/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

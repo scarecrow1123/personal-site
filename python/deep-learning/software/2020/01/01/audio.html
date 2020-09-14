@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Audio pre-processing for Machine Learning: Getting things right | fastpages</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Audio pre-processing for Machine Learning: Getting things right" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Basics of audio pre-processing required for machine learning" />
+<meta property="og:description" content="Basics of audio pre-processing required for machine learning" />
+<link rel="canonical" href="https://scarecrow1123.github.io/personal-site/python/deep-learning/software/2020/01/01/audio.html" />
+<meta property="og:url" content="https://scarecrow1123.github.io/personal-site/python/deep-learning/software/2020/01/01/audio.html" />
+<meta property="og:site_name" content="fastpages" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-01-01T00:00:00-06:00" />
+<script type="application/ld+json">
+{"description":"Basics of audio pre-processing required for machine learning","url":"https://scarecrow1123.github.io/personal-site/python/deep-learning/software/2020/01/01/audio.html","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://scarecrow1123.github.io/personal-site/python/deep-learning/software/2020/01/01/audio.html"},"headline":"Audio pre-processing for Machine Learning: Getting things right","dateModified":"2020-01-01T00:00:00-06:00","datePublished":"2020-01-01T00:00:00-06:00","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/personal-site/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://scarecrow1123.github.io/personal-site/feed.xml" title="fastpages" /><link rel="shortcut icon" type="image/x-icon" href="/personal-site/images/favicon.ico"><link href="https://unpkg.com/@primer/css/dist/primer.css" rel="stylesheet" />
+<link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css">
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/personal-site/">fastpages</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/personal-site/about/">About Me</a><a class="page-link" href="/personal-site/search/">Search</a><a class="page-link" href="/personal-site/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Audio pre-processing for Machine Learning: Getting things right</h1><p class="page-description">Basics of audio pre-processing required for machine learning</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2020-01-01T00:00:00-06:00" itemprop="datePublished">
+        Jan 1, 2020
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      5 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/personal-site/categories/#python">python</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/personal-site/categories/#deep-learning">deep-learning</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/personal-site/categories/#software">software</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul class="section-nav">
+<li class="toc-entry toc-h4"><a href="#fixing-on-a-data-format">Fixing on a data format</a></li>
+<li class="toc-entry toc-h4"><a href="#do-not-vary-the-sample-rate">Do not vary the sample rate</a></li>
+<li class="toc-entry toc-h4"><a href="#bit-depth">Bit depth</a></li>
+<li class="toc-entry toc-h4"><a href="#byte-order">Byte order</a></li>
+<li class="toc-entry toc-h4"><a href="#channels">Channels</a></li>
+<li class="toc-entry toc-h4"><a href="#a-standard-way-to-loadconvert-input-audio">A standard way to load/convert input audio</a></li>
+</ul><p><strong>Audio pre-processing for Machine Learning: Getting things right</strong></p>
+
+<p>For any machine learning experiment, careful handling of input data in terms of cleaning, encoding/decoding, featurizing are paramount. When it comes to applying machine learning for audio, it gets even trickier when compared with text/image, since dealing with audio involves many tiny details that can be overlooked. Any sort of inconsistency in the pre-processing pipeline could be a potential disaster in terms of the final accuracy of the overall system. We’ll look into a few basic things that need to be set right when writing an audio pre-processing pipeline.</p>
+
+<p><em>If you are not familiar with how audio input is fed to a machine learning model, I highly recommend reading these two articles first:  <a href="https://medium.com/@ageitgey/machine-learning-is-fun-part-6-how-to-do-speech-recognition-with-deep-learning-28293c162f7a">How to do Speech Recognition with Deep Learning</a>, <a href="https://haythamfayek.com/2016/04/21/speech-processing-for-machine-learning.html">Speech Processing for Machine Learning - Filter banks, etc.</a></em></p>
+
+<h4 id="fixing-on-a-data-format">
+<a class="anchor" href="#fixing-on-a-data-format" aria-hidden="true"><span class="octicon octicon-link"></span></a>Fixing on a data format</h4>
+<p>First step to get the pipeline right is to fix on a specific data format that the system would require. This would ensure a consistent interface that the dataset reader can rely upon. The usual practice is to use WAV which is a lossless format(FLAC is also another popular choice). Since WAV is an uncompressed format, it tends to be better when compared to lossy formats such as MP3, etc.</p>
+
+<h4 id="do-not-vary-the-sample-rate">
+<a class="anchor" href="#do-not-vary-the-sample-rate" aria-hidden="true"><span class="octicon octicon-link"></span></a>Do not vary the sample rate</h4>
+<p>WAV stores audio signals as a series of numbers also called the <strong>PCM (Pulse Code Modulation)</strong> data. PCM is a way to convert analog audio to digital data. So essentially if you are loading an audio file into a numpy array, it is the underlying PCM data that is loaded. Each number in the sequence is called a <strong>sample</strong>, that represents the amplitude of the signal at an approximate point in time. It is called a sample since the PCM method approximates the amplitude value by sampling the original audio signal for a fixed number of times every second. The number of samples taken for every second is the <strong>sampling rate</strong> of the signal. This is an important factor that needs to be uniform in the audio pipeline. If this varies in different parts of a system, things can get miserable! Many machine learning systems for audio applications such as speech recognition, wake-word detection, etc. can work well with <strong>16k Hz</strong> audio(16000 samples for every second of the original audio). So for example, a numpy array for a 5 second audio with 16k Hz sample rate would have the shape <code class="language-plaintext highlighter-rouge">(80000,)</code> ( 5 * 16000 = 80000).</p>
+
+<p>Popular audio libraries such as <a href="https://pysoundfile.readthedocs.io/en/0.9.0/">PySoundFile</a>, <a href="https://github.com/audeering/audiofile">audiofile</a>, <a href="https://librosa.github.io/librosa/index.html">librosa</a>, etc. in Python provide operations for loading audio to numpy array and return the sample rate of the signal. The libraries use the header information in WAV files to figure out the sample rate.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Using soundfile to load audio and know its sample rate
+</span><span class="kn">import</span> <span class="nn">soundfile</span> <span class="k">as</span> <span class="n">sf</span>
+
+<span class="n">audio</span><span class="p">,</span> <span class="n">sample_rate</span> <span class="o">=</span> <span class="n">sf</span><span class="p">.</span><span class="n">read</span><span class="p">(</span><span class="s">"sample.wav"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h4 id="bit-depth">
+<a class="anchor" href="#bit-depth" aria-hidden="true"><span class="octicon octicon-link"></span></a>Bit depth</h4>
+<p>This is a crucial property that needs to be handled correctly, especially in places where the data is loaded to arrays/tensors. <strong>Bit depth</strong> represents the number of bits required to represent each sample in the PCM audio data. In practice, <strong>16-bit</strong> signed integers can be used to store training data. During training, these 16-bit data can be loaded to 32-bit float tensors/arrays and can be fed to neural nets. Things can go wrong here say when a 24-bit audio file is loaded into a 16-bit array. Let’s take Python stdlib’s <code class="language-plaintext highlighter-rouge">wave</code> module for example, which returns a byte array from an audio file:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">wave</span>
+
+<span class="n">w</span> <span class="o">=</span> <span class="n">wave</span><span class="p">.</span><span class="nb">open</span><span class="p">(</span><span class="s">"sample_16b.wav"</span><span class="p">,</span> <span class="s">"rb"</span><span class="p">)</span>
+<span class="n">n_samples</span> <span class="o">=</span> <span class="n">w</span><span class="p">.</span><span class="n">getnframes</span><span class="p">()</span>
+<span class="n">audio_data</span> <span class="o">=</span> <span class="n">w</span><span class="p">.</span><span class="n">readnframes</span><span class="p">(</span><span class="n">n_samples</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>The byte array is converted into a np array using <code class="language-plaintext highlighter-rouge">np.frombuffer</code> and specifying the appropriate type of the data stored, 16-bit int in this case. Things will go wrong when it is loaded into a wrong container say <code class="language-plaintext highlighter-rouge">np.int8</code></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># correct type
+</span><span class="n">audio_array</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">audio_data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="p">.</span><span class="n">int16</span><span class="p">)</span>
+
+<span class="c1"># incorrect
+</span><span class="n">audio_array</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">audio_data</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="p">.</span><span class="n">int8</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Hence deciding on a standard bit depth that the system will always look for, will help eliminate overflows because of incorrect typecasting.</p>
+
+<h4 id="byte-order">
+<a class="anchor" href="#byte-order" aria-hidden="true"><span class="octicon octicon-link"></span></a>Byte order</h4>
+<p>It is also recommended to not to take the byte order for granted when reading/writing audio data. Even though the underlying codec may take into account the system’s byte order, for the paranoid ones, it is better to get fixed on one standard order, say <strong>little endian</strong>.</p>
+
+<h4 id="channels">
+<a class="anchor" href="#channels" aria-hidden="true"><span class="octicon octicon-link"></span></a>Channels</h4>
+<p>Number of channels can depend on the actual application for which the pre-processing step is done. For speech recognition let’s say, an input to a neural net is typically a single channel. In case of a stereo input, each channel can form distinct inputs to the neural net. Or the channels could be merged together to form a mono audio. However, this is an application specific choice.</p>
+
+<h4 id="a-standard-way-to-loadconvert-input-audio">
+<a class="anchor" href="#a-standard-way-to-loadconvert-input-audio" aria-hidden="true"><span class="octicon octicon-link"></span></a>A standard way to load/convert input audio</h4>
+<p>To make sure nothing goes wrong in your audio pre-processing pipeline, it would be the safest to assume none of your inputs is in the right format and always go for a standard format conversion routine. Below would be a set of useful ffmpeg options using <a href="https://github.com/kkroening/ffmpeg-python">ffmpeg-python</a> to standardize the incoming input:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">ffmpeg</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+
+<span class="n">stream</span> <span class="o">=</span> <span class="n">ffmpeg</span><span class="p">.</span><span class="nb">input</span><span class="p">(</span><span class="s">"sample.wav"</span><span class="p">)</span>
+<span class="c1"># set the output sample rate is 16000
+</span><span class="n">stream</span> <span class="o">=</span> <span class="n">ffmpeg</span><span class="p">.</span><span class="nb">filter</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="s">"aresample"</span><span class="p">,</span> <span class="n">osr</span><span class="o">=</span><span class="mi">16000</span><span class="p">)</span>
+<span class="c1"># set num channels = 1, bit depth to 16-bit int(s16), byte order to little endian(le) 
+</span><span class="n">stream</span> <span class="o">=</span> <span class="n">ffmpeg</span><span class="p">.</span><span class="n">output</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="s">"pipe:"</span><span class="p">,</span> <span class="n">ac</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">acodec</span><span class="o">=</span><span class="s">"pcm_s16le"</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s">"s16le"</span><span class="p">)</span>
+<span class="n">out</span><span class="p">,</span> <span class="n">err</span> <span class="o">=</span> <span class="n">ffmpeg</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">quiet</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="c1"># load it with proper data type (int16)
+</span><span class="n">audio_array</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="p">.</span><span class="n">int16</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Note that <code class="language-plaintext highlighter-rouge">audio_array</code> is raw PCM data and cannot be directly written into a WAV file. It is safe to use the IO mechanisms that the audio libraries provide to write the raw data into a WAV file. This will make sure appropriate headers are in place in the WAV file.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">soundfile</span> <span class="k">as</span> <span class="n">sf</span>
+
+<span class="n">sf</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="s">"sample_out.wav"</span><span class="p">,</span> <span class="n">audio_array</span><span class="p">,</span> <span class="n">samplerate</span><span class="o">=</span><span class="mi">16000</span><span class="p">,</span> <span class="n">subtype</span><span class="o">=</span><span class="s">"PCM_16"</span><span class="p">,</span> <span class="n">endian</span><span class="o">=</span><span class="s">"LITTLE"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>The raw array data however is the starting point for further pre-processing which depend on the downstream experiment/application. They can be converted to signal processing features such as spectrogram, MFCC, etc. which are supported by libraries such as <a href="https://librosa.github.io/librosa/index.html">librosa</a>, <a href="https://pytorch.org/audio/">torchaudio</a>, etc.</p>
+
+  </div><a class="u-url" href="/personal-site/python/deep-learning/software/2020/01/01/audio.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/personal-site/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/personal-site/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/personal-site/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>An easy to use blogging platform with support for Jupyter Notebooks.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/fastai" title="fastai"><svg class="svg-icon grey"><use xlink:href="/personal-site/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/fastdotai" title="fastdotai"><svg class="svg-icon grey"><use xlink:href="/personal-site/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
