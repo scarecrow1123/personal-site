@@ -4,8 +4,5 @@ title: About Me
 permalink: /about/
 ---
 
-This website is powered by **[fastpages](https://github.com/fastai/fastpages)** [^1].
+I am Ananda Seelan and this is my blog (or rather just a list of interesting things that I would like to note down for myself or a few others who might find it interesting).
 
-
-
-[^1]:a blogging platform that natively supports Jupyter notebooks in addition to other formats.
